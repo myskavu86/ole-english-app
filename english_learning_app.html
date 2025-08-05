@@ -1,0 +1,254 @@
+<!-- Combined English Learning App -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+        }
+        h1 {
+            color: #4caf50;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .hidden {
+            display: none;
+        }
+        .button {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .button.disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        .option {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            background-color: #e0f7fa;
+            border: 1px solid #4caf50;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .option:hover {
+            background-color: #b2ebf2;
+        }
+        .option.crossed-out {
+            text-decoration: line-through;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>English Learning App</h1>
+    <div id="daily-work" class="container">
+        <h2>Daily Work</h2>
+        <p>Complete all tasks to unlock more games and exercises!</p>
+        <button class="button" id="task-word-matching" onclick="startTask('word-matching')">Word Matching</button>
+        <button class="button" id="task-typing-practice" onclick="startTask('typing-practice')">Typing Practice</button>
+        <button class="button" id="task-writing-practice" onclick="startTask('writing-practice')">Writing Practice</button>
+    </div>
+
+    <div id="task-container" class="container hidden">
+        <h2 id="task-title"></h2>
+        <div id="task-content"></div>
+        <button class="button hidden" id="next-task-button" onclick="returnToDailyWork()">Return to Daily Work</button>
+    </div>
+
+    <div id="home-page" class="container hidden">
+        <h2>Welcome to the Home Page!</h2>
+        <p>Here are some fun English games and exercises:</p>
+        <h3>Games:</h3>
+        <ul>
+            <li>1. Vocabulary Quiz</li>
+            <li>2. Sentence Building</li>
+            <li>3. Grammar Challenge</li>
+        </ul>
+        <h3>Listening Exercises:</h3>
+        <ul>
+            <li>1. Listen and Repeat: Basic Words</li>
+            <li>2. Short Conversations</li>
+            <li>3. Story Listening</li>
+        </ul>
+    </div>
+
+    <script>
+        let completedTasks = 0;
+
+        function startTask(task) {
+            document.getElementById('daily-work').classList.add('hidden');
+            document.getElementById('task-container').classList.remove('hidden');
+
+            const taskTitle = document.getElementById('task-title');
+            const taskContent = document.getElementById('task-content');
+            const nextTaskButton = document.getElementById('next-task-button');
+            nextTaskButton.classList.add('hidden');
+
+            if (task === 'word-matching') {
+                taskTitle.textContent = "Word Matching";
+                startWordMatching(taskContent, nextTaskButton, 'task-word-matching');
+            } else if (task === 'typing-practice') {
+                taskTitle.textContent = "Typing Practice";
+                startTypingPractice(taskContent, nextTaskButton, 'task-typing-practice');
+            } else if (task === 'writing-practice') {
+                taskTitle.textContent = "Writing Practice";
+                startWritingPractice(taskContent, nextTaskButton, 'task-writing-practice');
+            }
+        }
+
+        function returnToDailyWork() {
+            document.getElementById('task-container').classList.add('hidden');
+            document.getElementById('daily-work').classList.remove('hidden');
+
+            if (completedTasks === 3) {
+                document.getElementById('daily-work').classList.add('hidden');
+                document.getElementById('home-page').classList.remove('hidden');
+            }
+        }
+
+        function markTaskComplete(taskId) {
+            const taskButton = document.getElementById(taskId);
+            taskButton.classList.add('disabled');
+            taskButton.disabled = true;
+            completedTasks++;
+        }
+
+        function startWordMatching(container, nextButton, taskId) {
+            container.innerHTML = `<p id="word-display">Loading...</p><div id="options-container"></div>`;
+
+            const wordDisplay = document.getElementById("word-display");
+            const optionsContainer = document.getElementById("options-container");
+
+            const words = [
+                { word: "Apple", correctMeaning: "A fruit" },
+                { word: "Dog", correctMeaning: "An animal" },
+                { word: "Book", correctMeaning: "Something to read" },
+                { word: "Car", correctMeaning: "A vehicle" },
+                { word: "Tree", correctMeaning: "A plant with a trunk" },
+                { word: "Chair", correctMeaning: "A piece of furniture to sit on" }
+            ];
+
+            const incorrectMeanings = [
+                "A type of food", "A machine", "A color", "A shape",
+                "A tool", "A type of clothing", "A building", "A type of drink"
+            ];
+
+            const randomWord = words[Math.floor(Math.random() * words.length)];
+            wordDisplay.textContent = `What is the meaning of "${randomWord.word}"?`;
+
+            const options = [randomWord.correctMeaning];
+            while (options.length < 4) {
+                const randomIncorrect = incorrectMeanings[Math.floor(Math.random() * incorrectMeanings.length)];
+                if (!options.includes(randomIncorrect)) {
+                    options.push(randomIncorrect);
+                }
+            }
+
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(option => {
+                const optionElement = document.createElement("div");
+                optionElement.textContent = option;
+                optionElement.className = "option";
+                optionElement.onclick = () => {
+                    if (option === randomWord.correctMeaning) {
+                        alert("Correct! Great job!");
+                        markTaskComplete(taskId);
+                        nextButton.classList.remove("hidden");
+                    } else {
+                        alert("Wrong! Try again.");
+                        optionElement.classList.add("crossed-out");
+                        optionElement.onclick = null;
+                    }
+                };
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        function startTypingPractice(container, nextButton, taskId) {
+            const word = "Programming";
+            container.innerHTML = `<p>Type the word: <strong>${word}</strong></p>`;
+            const input = document.createElement("input");
+            input.type = "text";
+            input.placeholder = "Type here...";
+            const button = document.createElement("button");
+            button.textContent = "Submit";
+            button.className = "button";
+            button.onclick = () => {
+                if (input.value === word) {
+                    alert("Correct!");
+                } else {
+                    alert("Wrong!");
+                }
+                markTaskComplete(taskId);
+                nextButton.classList.remove("hidden");
+            };
+            container.appendChild(input);
+            container.appendChild(button);
+        }
+
+        function startWritingPractice(container, nextButton, taskId) {
+            container.innerHTML = "<p>Write the word 'Hello' using your mouse:</p>";
+            const canvas = document.createElement("canvas");
+            canvas.width = 400;
+            canvas.height = 200;
+            const ctx = canvas.getContext("2d");
+            let drawing = false;
+
+            canvas.onmousedown = () => (drawing = true);
+            canvas.onmouseup = () => (drawing = false);
+            canvas.onmousemove = (e) => {
+                if (drawing) {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    ctx.fillStyle = "black";
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            };
+
+            const button = document.createElement("button");
+            button.textContent = "Submit";
+            button.className = "button";
+            button.onclick = () => {
+                alert("Great job! Writing practice complete.");
+                markTaskComplete(taskId);
+                nextButton.classList.remove("hidden");
+            };
+
+            container.appendChild(canvas);
+            container.appendChild(button);
+        }
+    </script>
+</body>
+</html>
